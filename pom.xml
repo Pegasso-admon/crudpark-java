@@ -1,0 +1,149 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>com.crudpark</groupId>
+  <artifactId>crudpark-java</artifactId> <!-- Renombrado para coincidir con el PROJECT_NAME del script -->
+  <version>1.0-SNAPSHOT</version>
+  <name>CrudPark Java Desktop App</name>
+  <url>https://teams.crudzaso.com/crudpark-java</url> <!-- Actualizado a una URL más relevante -->
+  <description>
+    Aplicación operativa de escritorio para el sistema CrudPark,
+    desarrollada en Java Swing con conexión a PostgreSQL/MySQL.
+  </description>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>11</maven.compiler.source> <!-- Actualizado a Java 11 (LTS) -->
+    <maven.compiler.target>11</maven.compiler.target> <!-- Actualizado a Java 11 (LTS) -->
+    <junit.version>5.10.0</junit.version> <!-- Actualizado a JUnit 5 -->
+    <mysql.connector.version>8.0.33</mysql.connector.version> <!-- Version para MySQL Connector/J -->
+    <zxing.version>3.5.3</zxing.version> <!-- Version para ZXing -->
+    <log4j.version>2.23.1</log4j.version> <!-- Version para Log4j2 -->
+    <main.class>com.crudpark.MainApp</main.class> <!-- Define la clase principal para el plugin exec -->
+  </properties>
+
+  <dependencies>
+    <!-- Dependencia para JUnit 5 (recomendado para pruebas modernas en Java) -->
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-engine</artifactId>
+      <version>${junit.version}</version>
+      <scope>test</scope>
+    </dependency>
+
+    <!-- MySQL JDBC Driver (Connector/J) -->
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <version>${mysql.connector.version}</version>
+    </dependency>
+
+    <!-- Opcional: Si por alguna razón usas PostgreSQL en el futuro, puedes descomentar/cambiar -->
+    <!--
+    <dependency>
+        <groupId>org.postgresql</groupId>
+        <artifactId>postgresql</artifactId>
+        <version>42.7.3</version>
+    </dependency>
+    -->
+
+    <!-- ZXing Core (Para generar QR) -->
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>core</artifactId>
+      <version>${zxing.version}</version>
+    </dependency>
+
+    <!-- ZXing JavaSE (Para funcionalidades específicas de Java, como convertir a BufferedImage) -->
+    <dependency>
+      <groupId>com.google.zxing</groupId>
+      <artifactId>javase</artifactId>
+      <version>${zxing.version}</version>
+    </dependency>
+
+    <!-- Log4j2 (Para logging, buena practica para aplicaciones robustas) -->
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-api</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.logging.log4j</groupId>
+      <artifactId>log4j-core</artifactId>
+      <version>${log4j.version}</version>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <pluginManagement>
+      <plugins>
+        <plugin>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>3.1.0</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>3.0.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.8.1</version> <!-- Actualizado -->
+          <configuration>
+            <source>${maven.compiler.source}</source>
+            <target>${maven.compiler.target}</target>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>2.22.2</version> <!-- Actualizado -->
+        </plugin>
+        <plugin>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>3.2.0</version> <!-- Actualizado -->
+          <configuration>
+            <archive>
+              <manifest>
+                <addClasspath>true</addClasspath>
+                <mainClass>${main.class}</mainClass>
+              </manifest>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>2.5.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>2.8.2</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>3.7.1</version>
+        </plugin>
+        <plugin>
+          <artifactId>maven-project-info-reports-plugin</artifactId>
+          <version>3.0.0</version>
+        </plugin>
+        <!-- Plugin para ejecutar la aplicación directamente desde Maven -->
+        <plugin>
+          <groupId>org.codehaus.mojo</groupId>
+          <artifactId>exec-maven-plugin</artifactId>
+          <version>3.1.0</version> <!-- Versión reciente -->
+          <configuration>
+            <mainClass>${main.class}</mainClass>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+</project>
