@@ -146,7 +146,7 @@ SELECT
     t.id,
     t.plate,
     t.entry_time,
-    t.ticket_type,
+    CAST(t.ticket_type AS VARCHAR) as ticket_type,
     o.name as operator_name,
     EXTRACT(EPOCH FROM (CURRENT_TIMESTAMP - t.entry_time))/60 as minutes_elapsed
 FROM tickets t
@@ -154,16 +154,16 @@ JOIN operators o ON t.operator_id = o.id
 WHERE t.active = TRUE
 ORDER BY t.entry_time DESC;
 
--- Daily revenue view
+-- Daily revenue view (CORREGIDO - Cast de ENUMs en CASE)
 CREATE OR REPLACE VIEW v_daily_revenue AS
 SELECT 
     DATE(p.payment_time) as payment_date,
     COUNT(*) as total_payments,
     SUM(p.amount) as total_revenue,
     AVG(p.amount) as avg_payment,
-    COUNT(CASE WHEN p.payment_method = 'CASH' THEN 1 END) as cash_payments,
-    COUNT(CASE WHEN p.payment_method = 'CARD' THEN 1 END) as card_payments,
-    COUNT(CASE WHEN p.payment_method = 'TRANSFER' THEN 1 END) as transfer_payments
+    COUNT(CASE WHEN CAST(p.payment_method AS VARCHAR) = 'CASH' THEN 1 END) as cash_payments,
+    COUNT(CASE WHEN CAST(p.payment_method AS VARCHAR) = 'CARD' THEN 1 END) as card_payments,
+    COUNT(CASE WHEN CAST(p.payment_method AS VARCHAR) = 'TRANSFER' THEN 1 END) as transfer_payments
 FROM payments p
 GROUP BY DATE(p.payment_time)
 ORDER BY payment_date DESC;
