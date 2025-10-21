@@ -8,6 +8,14 @@ DROP TABLE IF EXISTS memberships CASCADE;
 DROP TABLE IF EXISTS rates CASCADE;
 DROP TABLE IF EXISTS operators CASCADE;
 
+-- Drop types if they exist
+DROP TYPE IF EXISTS ticket_type_enum CASCADE;
+DROP TYPE IF EXISTS payment_method_enum CASCADE;
+
+-- Create custom ENUM types (BEFORE creating tables)
+CREATE TYPE ticket_type_enum AS ENUM ('MONTHLY', 'GUEST');
+CREATE TYPE payment_method_enum AS ENUM ('CASH', 'CARD', 'TRANSFER');
+
 -- Operators table
 CREATE TABLE operators (
     id SERIAL PRIMARY KEY,
@@ -68,10 +76,6 @@ CREATE TABLE rates (
 -- Create trigger for rates
 CREATE TRIGGER update_rates_updated_at BEFORE UPDATE ON rates
 FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
-
--- Create custom ENUM types
-CREATE TYPE ticket_type_enum AS ENUM ('MONTHLY', 'GUEST');
-CREATE TYPE payment_method_enum AS ENUM ('CASH', 'CARD', 'TRANSFER');
 
 -- Tickets table
 CREATE TABLE tickets (
