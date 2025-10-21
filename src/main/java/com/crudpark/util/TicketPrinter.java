@@ -1,4 +1,3 @@
-// util/TicketPrinter.java - OPTIMIZADO PARA LINUX
 package com.crudpark.util;
 
 import com.crudpark.model.Ticket;
@@ -23,46 +22,40 @@ public class TicketPrinter {
 
     public static void printTicket(Ticket ticket) {
         try {
-            System.out.println("\n🖨️ Iniciando proceso de impresión...");
+            System.out.println("\nStarting print process...");
             
-            // Generate QR code
             long timestamp = ticket.getEntryTime().atZone(java.time.ZoneId.systemDefault()).toEpochSecond();
             String qrData = QRCodeGenerator.formatTicketData(ticket.getId(), ticket.getPlate(), timestamp);
             BufferedImage qrImage = QRCodeGenerator.generateQRCode(qrData, 150, 150);
 
-            // Detectar impresoras disponibles
             PrintService[] printServices = PrinterJob.lookupPrintServices();
             
             if (printServices.length == 0) {
-                System.out.println("⚠️ No se detectaron impresoras. Guardando como imagen...");
+                System.out.println("No printers detected. Saving as image...");
                 savePrintPreview(ticket, qrImage);
                 return;
             }
 
-            // Mostrar impresoras disponibles
-            System.out.println("\n📋 Impresoras disponibles:");
+            System.out.println("\nAvailable printers:");
             for (int i = 0; i < printServices.length; i++) {
                 System.out.println("  [" + i + "] " + printServices[i].getName());
             }
 
-            // Buscar impresora térmica o usar la predeterminada
             PrintService selectedPrinter = findThermalPrinter(printServices);
             
             if (selectedPrinter != null) {
-                System.out.println("✅ Usando impresora: " + selectedPrinter.getName());
+                System.out.println("Using printer: " + selectedPrinter.getName());
                 printToService(ticket, qrImage, selectedPrinter);
             } else {
-                // Mostrar diálogo de selección de impresora
-                System.out.println("🔍 Mostrando diálogo de selección...");
+                System.out.println("Showing printer selection dialog...");
                 printWithDialog(ticket, qrImage);
             }
             
         } catch (Exception e) {
-            System.err.println("❌ Error de impresión: " + e.getMessage());
+            System.err.println("Print error: " + e.getMessage());
             e.printStackTrace();
             
             try {
-                // Fallback: guardar como imagen
                 long timestamp = ticket.getEntryTime().atZone(java.time.ZoneId.systemDefault()).toEpochSecond();
                 String qrData = QRCodeGenerator.formatTicketData(ticket.getId(), ticket.getPlate(), timestamp);
                 BufferedImage qrImage = QRCodeGenerator.generateQRCode(qrData, 150, 150);
@@ -74,7 +67,6 @@ public class TicketPrinter {
     }
 
     private static PrintService findThermalPrinter(PrintService[] services) {
-        // Buscar impresoras que contengan palabras clave comunes de impresoras térmicas
         String[] thermalKeywords = {"thermal", "pos", "receipt", "ticket", "80mm", "58mm", "tsc", "zebra", "epson"};
         
         for (PrintService service : services) {
@@ -86,7 +78,6 @@ public class TicketPrinter {
             }
         }
         
-        // Si no encuentra térmica, devolver la predeterminada
         return PrintServiceLookup.lookupDefaultPrintService();
     }
 
@@ -97,19 +88,20 @@ public class TicketPrinter {
         PageFormat pageFormat = job.defaultPage();
         Paper paper = new Paper();
         
-        // Tamaño de papel térmico 80mm
-        double width = 226.77;  // ~80mm en puntos
-        double height = 600;
+        double width = 165;
+        double height = 842;
         paper.setSize(width, height);
-        paper.setImageableArea(0, 0, width, height);
+        
+        double margin = 5;
+        paper.setImageableArea(margin, margin, width - (margin * 2), height - (margin * 2));
+        
         pageFormat.setPaper(paper);
         pageFormat.setOrientation(PageFormat.PORTRAIT);
 
         job.setPrintable(new TicketPrintable(ticket, qrImage), pageFormat);
         
-        // Imprimir sin diálogo
         job.print();
-        System.out.println("✅ Ticket enviado a impresora: " + printService.getName());
+        System.out.println("Ticket sent to printer: " + printService.getName());
     }
 
     private static void printWithDialog(Ticket ticket, BufferedImage qrImage) throws PrinterException {
@@ -118,22 +110,22 @@ public class TicketPrinter {
         PageFormat pageFormat = job.defaultPage();
         Paper paper = new Paper();
         
-        // Tamaño de papel térmico 80mm
-        double width = 226.77;  // ~80mm en puntos
-        double height = 600;
+        double width = 165;
+        double height = 842;
         paper.setSize(width, height);
-        paper.setImageableArea(0, 0, width, height);
+        
+        double margin = 5;
+        paper.setImageableArea(margin, margin, width - (margin * 2), height - (margin * 2));
+        
         pageFormat.setPaper(paper);
 
         job.setPrintable(new TicketPrintable(ticket, qrImage), pageFormat);
 
-        // Mostrar diálogo de impresión
         if (job.printDialog()) {
             job.print();
-            System.out.println("✅ Ticket impreso correctamente");
+            System.out.println("Ticket printed successfully");
         } else {
-            System.out.println("⚠️ Impresión cancelada por el usuario");
-            // Guardar como imagen si se cancela
+            System.out.println("Print cancelled by user");
             savePrintPreview(ticket, qrImage);
         }
     }
@@ -142,7 +134,6 @@ public class TicketPrinter {
         try {
             BufferedImage preview = createTicketImage(ticket, qrImage);
             
-            // Crear directorio si no existe
             File outputDir = new File("tickets");
             if (!outputDir.exists()) {
                 outputDir.mkdirs();
@@ -150,16 +141,15 @@ public class TicketPrinter {
             
             File output = new File(outputDir, "ticket_" + ticket.getId() + ".png");
             ImageIO.write(preview, "PNG", output);
-            System.out.println("✅ Ticket guardado como imagen: " + output.getAbsolutePath());
+            System.out.println("Ticket saved as image: " + output.getAbsolutePath());
             
-            // Mostrar preview en un diálogo
             SwingUtilities.invokeLater(() -> {
                 JLabel label = new JLabel(new ImageIcon(preview));
                 JPanel panel = new JPanel(new BorderLayout());
                 panel.add(label, BorderLayout.CENTER);
                 
                 JLabel infoLabel = new JLabel(
-                    "<html><center>Ticket guardado en:<br>" + 
+                    "<html><center>Ticket saved at:<br>" + 
                     output.getAbsolutePath() + 
                     "</center></html>"
                 );
@@ -170,13 +160,13 @@ public class TicketPrinter {
                 JOptionPane.showMessageDialog(
                     null, 
                     panel, 
-                    "Vista Previa del Ticket", 
+                    "Ticket Preview", 
                     JOptionPane.PLAIN_MESSAGE
                 );
             });
             
         } catch (Exception e) {
-            System.err.println("❌ Error al guardar imagen: " + e.getMessage());
+            System.err.println("Error saving image: " + e.getMessage());
             e.printStackTrace();
         }
     }
@@ -186,53 +176,47 @@ public class TicketPrinter {
         BufferedImage image = new BufferedImage(TICKET_WIDTH, height, BufferedImage.TYPE_INT_RGB);
         Graphics2D g2d = image.createGraphics();
         
-        // Habilitar antialiasing para mejor calidad
         g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2d.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
         
-        // Fondo blanco
         g2d.setColor(Color.WHITE);
         g2d.fillRect(0, 0, TICKET_WIDTH, height);
         
-        // Dibujar contenido del ticket
         g2d.setColor(Color.BLACK);
         int y = 20;
         
-        // Encabezado
         g2d.setFont(new Font("Arial", Font.BOLD, 18));
         drawCenteredString(g2d, "CrudPark", TICKET_WIDTH, y);
         y += 20;
         
         g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-        drawCenteredString(g2d, "Sistema de Parqueo", TICKET_WIDTH, y);
+        drawCenteredString(g2d, "Parking System", TICKET_WIDTH, y);
         y += 25;
         
         drawLine(g2d, y);
         y += 20;
         
-        // Información del ticket
         g2d.setFont(new Font("Monospaced", Font.BOLD, 14));
         g2d.drawString("Ticket #: " + String.format("%06d", ticket.getId()), 20, y);
         y += 25;
         
         g2d.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        g2d.drawString("Placa: " + ticket.getPlate(), 20, y);
+        g2d.drawString("Plate: " + ticket.getPlate(), 20, y);
         y += 20;
-        g2d.drawString("Tipo: " + ticket.getTicketType(), 20, y);
+        g2d.drawString("Type: " + ticket.getTicketType(), 20, y);
         y += 20;
-        g2d.drawString("Entrada: ", 20, y);
+        g2d.drawString("Entry: ", 20, y);
         y += 15;
         g2d.setFont(new Font("Monospaced", Font.PLAIN, 10));
         g2d.drawString("  " + ticket.getEntryTime().format(DATE_FORMAT), 20, y);
         y += 20;
         g2d.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        g2d.drawString("Operador: " + ticket.getOperatorName(), 20, y);
+        g2d.drawString("Operator: " + ticket.getOperatorName(), 20, y);
         y += 25;
         
         drawLine(g2d, y);
         y += 20;
         
-        // Código QR
         int qrX = (TICKET_WIDTH - qrImage.getWidth()) / 2;
         g2d.drawImage(qrImage, qrX, y, null);
         y += qrImage.getHeight() + 20;
@@ -240,11 +224,10 @@ public class TicketPrinter {
         drawLine(g2d, y);
         y += 20;
         
-        // Pie de página
         g2d.setFont(new Font("Arial", Font.ITALIC, 10));
-        drawCenteredString(g2d, "Gracias por su visita", TICKET_WIDTH, y);
+        drawCenteredString(g2d, "Thank you for your visit", TICKET_WIDTH, y);
         y += 15;
-        drawCenteredString(g2d, "Conserve este ticket", TICKET_WIDTH, y);
+        drawCenteredString(g2d, "Keep this ticket", TICKET_WIDTH, y);
         
         g2d.dispose();
         return image;
@@ -260,7 +243,6 @@ public class TicketPrinter {
         g2d.drawLine(20, y, TICKET_WIDTH - 20, y);
     }
 
-    // Implementación Printable
     private static class TicketPrintable implements Printable {
         private Ticket ticket;
         private BufferedImage qrImage;
@@ -279,10 +261,8 @@ public class TicketPrinter {
             Graphics2D g2d = (Graphics2D) graphics;
             g2d.translate(pageFormat.getImageableX(), pageFormat.getImageableY());
 
-            // Dibujar ticket
             BufferedImage ticketImage = createTicketImage(ticket, qrImage);
             
-            // Escalar si es necesario para que quepa en el papel
             double scaleX = pageFormat.getImageableWidth() / ticketImage.getWidth();
             double scaleY = pageFormat.getImageableHeight() / ticketImage.getHeight();
             double scale = Math.min(scaleX, scaleY);
@@ -299,31 +279,30 @@ public class TicketPrinter {
         }
     }
     
-    // Método de utilidad para listar todas las impresoras disponibles
     public static void listAvailablePrinters() {
-        System.out.println("\n🖨️ Listando todas las impresoras disponibles:");
+        System.out.println("\nListing all available printers:");
         PrintService[] printServices = PrinterJob.lookupPrintServices();
         
         if (printServices.length == 0) {
-            System.out.println("❌ No se detectaron impresoras en el sistema");
-            System.out.println("\n💡 Sugerencias para Linux Ubuntu:");
-            System.out.println("  1. Verificar que CUPS esté instalado: sudo apt install cups");
-            System.out.println("  2. Iniciar servicio CUPS: sudo systemctl start cups");
-            System.out.println("  3. Agregar impresora en Configuración del Sistema");
-            System.out.println("  4. Verificar: lpstat -p -d");
+            System.out.println("No printers detected in system");
+            System.out.println("\nSuggestions for Linux Ubuntu:");
+            System.out.println("  1. Verify CUPS is installed: sudo apt install cups");
+            System.out.println("  2. Start CUPS service: sudo systemctl start cups");
+            System.out.println("  3. Add printer in System Settings");
+            System.out.println("  4. Check: lpstat -p -d");
         } else {
             for (int i = 0; i < printServices.length; i++) {
                 PrintService ps = printServices[i];
                 System.out.println("\n  [" + i + "] " + ps.getName());
-                System.out.println("      Estado: " + (ps.isDocFlavorSupported(DocFlavor.SERVICE_FORMATTED.PRINTABLE) ? "✅ Compatible" : "⚠️ Verificar compatibilidad"));
+                System.out.println("      Status: " + (ps.isDocFlavorSupported(DocFlavor.SERVICE_FORMATTED.PRINTABLE) ? "Compatible" : "Check compatibility"));
             }
         }
         
         PrintService defaultService = PrintServiceLookup.lookupDefaultPrintService();
         if (defaultService != null) {
-            System.out.println("\n📌 Impresora predeterminada: " + defaultService.getName());
+            System.out.println("\nDefault printer: " + defaultService.getName());
         } else {
-            System.out.println("\n⚠️ No hay impresora predeterminada configurada");
+            System.out.println("\nNo default printer configured");
         }
     }
 }
