@@ -12,10 +12,11 @@ public class Payment {
     private LocalDateTime paymentTime;
     private int operatorId;
 
-    public Payment() {}
+    public Payment() {
+    }
 
-    public Payment(int id, int ticketId, BigDecimal amount, String paymentMethod, 
-                   LocalDateTime paymentTime, int operatorId) {
+    public Payment(int id, int ticketId, BigDecimal amount, String paymentMethod,
+            LocalDateTime paymentTime, int operatorId) {
         this.id = id;
         this.ticketId = ticketId;
         this.amount = amount;
@@ -25,21 +26,51 @@ public class Payment {
     }
 
     // Getters and Setters
-    public int getId() { return id; }
-    public void setId(int id) { this.id = id; }
-    
-    public int getTicketId() { return ticketId; }
-    public void setTicketId(int ticketId) { this.ticketId = ticketId; }
-    
-    public BigDecimal getAmount() { return amount; }
-    public void setAmount(BigDecimal amount) { this.amount = amount; }
-    
-    public String getPaymentMethod() { return paymentMethod; }
-    public void setPaymentMethod(String paymentMethod) { this.paymentMethod = paymentMethod; }
-    
-    public LocalDateTime getPaymentTime() { return paymentTime; }
-    public void setPaymentTime(LocalDateTime paymentTime) { this.paymentTime = paymentTime; }
-    
-    public int getOperatorId() { return operatorId; }
-    public void setOperatorId(int operatorId) { this.operatorId = operatorId; }
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
+
+    public int getTicketId() {
+        return ticketId;
+    }
+
+    public void setTicketId(int ticketId) {
+        this.ticketId = ticketId;
+    }
+
+    public BigDecimal getAmount() {
+        return amount;
+    }
+
+    public void setAmount(BigDecimal amount) {
+        this.amount = amount;
+    }
+
+    public String getPaymentMethod() {
+        return paymentMethod;
+    }
+
+    public void setPaymentMethod(String paymentMethod) {
+        this.paymentMethod = paymentMethod;
+    }
+
+    public LocalDateTime getPaymentTime() {
+        return paymentTime;
+    }
+
+    public void setPaymentTime(LocalDateTime paymentTime) {
+        this.paymentTime = paymentTime;
+    }
+
+    public int getOperatorId() {
+        return operatorId;
+    }
+
+    public void setOperatorId(int operatorId) {
+        this.operatorId = operatorId;
+    }
 }
