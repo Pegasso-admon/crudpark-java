@@ -117,12 +117,6 @@ public class LoginDialog extends JDialog {
         mainPanel.add(loginButton);
         mainPanel.add(Box.createVerticalStrut(10));
         
-        JLabel hintLabel = new JLabel("Default: admin / admin123");
-        hintLabel.setFont(new Font("Arial", Font.ITALIC, 10));
-        hintLabel.setForeground(Color.GRAY);
-        hintLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
-        mainPanel.add(hintLabel);
-        
         add(mainPanel, BorderLayout.CENTER);
     }
 
