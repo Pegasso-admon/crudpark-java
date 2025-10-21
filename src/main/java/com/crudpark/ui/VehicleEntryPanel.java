@@ -17,6 +17,7 @@ public class VehicleEntryPanel extends JPanel {
     
     private JTextField plateField;
     private JButton registerButton;
+    private JButton printButton;
     private JTextArea logArea;
     private JLabel qrLabel;
     private JPanel ticketInfoPanel;
@@ -24,6 +25,7 @@ public class VehicleEntryPanel extends JPanel {
     private JLabel ticketTypeLabel;
     private JLabel plateLabel;
     private JLabel timeLabel;
+    private Ticket lastTicket;
 
     public VehicleEntryPanel(Operator operator) {
         this.currentOperator = operator;
@@ -54,6 +56,16 @@ public class VehicleEntryPanel extends JPanel {
         registerButton.setBorderPainted(false);
         registerButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         registerButton.setPreferredSize(new Dimension(150, 40));
+        
+        printButton = new JButton("Print Ticket");
+        printButton.setFont(new Font("Arial", Font.BOLD, 14));
+        printButton.setBackground(new Color(96, 125, 139));
+        printButton.setForeground(Color.WHITE);
+        printButton.setFocusPainted(false);
+        printButton.setBorderPainted(false);
+        printButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        printButton.setPreferredSize(new Dimension(150, 40));
+        printButton.setEnabled(false);
         
         logArea = new JTextArea(10, 50);
         logArea.setEditable(false);
@@ -109,6 +121,7 @@ public class VehicleEntryPanel extends JPanel {
         topPanel.add(plateFieldLabel);
         topPanel.add(plateField);
         topPanel.add(registerButton);
+        topPanel.add(printButton);
         
         JPanel centerPanel = new JPanel(new BorderLayout(15, 15));
         centerPanel.setBackground(new Color(30, 30, 30));
@@ -162,6 +175,7 @@ public class VehicleEntryPanel extends JPanel {
     private void addListeners() {
         registerButton.addActionListener(e -> registerEntry());
         plateField.addActionListener(e -> registerEntry());
+        printButton.addActionListener(e -> printLastTicket());
         
         registerButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -169,6 +183,19 @@ public class VehicleEntryPanel extends JPanel {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 registerButton.setBackground(new Color(0, 150, 136));
+            }
+        });
+        
+        printButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if (printButton.isEnabled()) {
+                    printButton.setBackground(new Color(120, 144, 156));
+                }
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (printButton.isEnabled()) {
+                    printButton.setBackground(new Color(96, 125, 139));
+                }
             }
         });
     }
@@ -183,10 +210,10 @@ public class VehicleEntryPanel extends JPanel {
 
         try {
             Ticket ticket = parkingService.registerEntry(plate, currentOperator);
+            lastTicket = ticket;
             
             displayTicketInfo(ticket);
-            
-            TicketPrinter.printTicket(ticket);
+            printButton.setEnabled(true);
             
             logArea.append(String.format("[%s] SUCCESS - Ticket #%06d created for %s (%s)\n",
                 java.time.LocalTime.now().format(java.time.format.DateTimeFormatter.ofPattern("HH:mm:ss")),
@@ -214,12 +241,19 @@ public class VehicleEntryPanel extends JPanel {
         }
     }
     
+    private void printLastTicket() {
+        if (lastTicket != null) {
+            TicketPrinter.printTicket(lastTicket);
+        }
+    }
+    
     private void displayTicketInfo(Ticket ticket) {
         try {
             long timestamp = ticket.getEntryTime().atZone(java.time.ZoneId.systemDefault()).toEpochSecond();
             String qrData = QRCodeGenerator.formatTicketData(ticket.getId(), ticket.getPlate(), timestamp);
             BufferedImage qrImage = QRCodeGenerator.generateQRCode(qrData, 180, 180);
             qrLabel.setIcon(new ImageIcon(qrImage));
+            qrLabel.setText(null);
             
             ticketIdLabel.setText("Ticket #: " + String.format("%06d", ticket.getId()));
             ticketTypeLabel.setText("Type: " + ticket.getTicketType());
@@ -241,6 +275,8 @@ public class VehicleEntryPanel extends JPanel {
         ticketTypeLabel.setText("");
         plateLabel.setText("");
         timeLabel.setText("");
+        printButton.setEnabled(false);
+        lastTicket = null;
     }
     
     private void showError(String message) {

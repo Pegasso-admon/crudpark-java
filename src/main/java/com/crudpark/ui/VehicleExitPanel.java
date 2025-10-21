@@ -177,18 +177,28 @@ public class VehicleExitPanel extends JPanel {
             displayExitInfo(result, timeStr);
             
             if (result.isPaymentRequired()) {
-                int paymentChoice = showPaymentDialog(result.getAmountToPay());
+                String[] options = {"Cash", "Card", "Transfer", "Cancel"};
+                int choice = JOptionPane.showOptionDialog(
+                    this,
+                    String.format("Amount to pay: $%.2f\n\nSelect payment method:", result.getAmountToPay()),
+                    "Payment Required",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.QUESTION_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+                );
                 
-                if (paymentChoice >= 0 && paymentChoice < 3) {
+                if (choice >= 0 && choice < 3) {
                     String[] methods = {"CASH", "CARD", "TRANSFER"};
                     parkingService.registerPayment(
                         result.getTicket().getId(),
                         result.getAmountToPay(),
-                        methods[paymentChoice],
+                        methods[choice],
                         currentOperator.getId()
                     );
                     
-                    statusLabel.setText("Status: PAID - " + methods[paymentChoice]);
+                    statusLabel.setText("Status: PAID - " + methods[choice]);
                     statusLabel.setForeground(new Color(76, 175, 80));
                     
                     logArea.append(String.format("[%s] EXIT - Ticket #%06d | %s | Time: %s | Paid: $%.2f (%s)\n",
@@ -197,11 +207,11 @@ public class VehicleExitPanel extends JPanel {
                         plate,
                         timeStr,
                         result.getAmountToPay(),
-                        methods[paymentChoice]));
+                        methods[choice]));
                     logArea.setCaretPosition(logArea.getDocument().getLength());
                         
                     showSuccess(String.format("Payment processed successfully!\nAmount: $%.2f\nMethod: %s", 
-                        result.getAmountToPay(), methods[paymentChoice]));
+                        result.getAmountToPay(), methods[choice]));
                 }
             } else {
                 statusLabel.setText("Status: NO CHARGE");
@@ -256,42 +266,6 @@ public class VehicleExitPanel extends JPanel {
         durationLabel.setText("");
         amountLabel.setText("");
         statusLabel.setText("");
-    }
-
-    private int showPaymentDialog(BigDecimal amount) {
-        JPanel panel = new JPanel(new BorderLayout(10, 10));
-        panel.setBackground(new Color(40, 40, 40));
-        panel.setBorder(new EmptyBorder(20, 20, 20, 20));
-        
-        JLabel amountLabel = new JLabel(String.format("Amount to pay: $%.2f", amount));
-        amountLabel.setFont(new Font("Arial", Font.BOLD, 18));
-        amountLabel.setForeground(Color.WHITE);
-        amountLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        JLabel questionLabel = new JLabel("Select payment method:");
-        questionLabel.setFont(new Font("Arial", Font.PLAIN, 14));
-        questionLabel.setForeground(Color.LIGHT_GRAY);
-        questionLabel.setHorizontalAlignment(SwingConstants.CENTER);
-        
-        JPanel labelPanel = new JPanel(new GridLayout(2, 1, 0, 10));
-        labelPanel.setBackground(new Color(40, 40, 40));
-        labelPanel.add(amountLabel);
-        labelPanel.add(questionLabel);
-        
-        panel.add(labelPanel, BorderLayout.CENTER);
-        
-        String[] options = {"Cash", "Card", "Transfer", "Cancel"};
-        
-        return JOptionPane.showOptionDialog(
-            this,
-            panel,
-            "Payment Required",
-            JOptionPane.DEFAULT_OPTION,
-            JOptionPane.PLAIN_MESSAGE,
-            null,
-            options,
-            options[0]
-        );
     }
     
     private void showError(String message) {
