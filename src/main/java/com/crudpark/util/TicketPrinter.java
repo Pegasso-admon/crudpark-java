@@ -154,34 +154,34 @@ public class TicketPrinter {
         g2d.setColor(Color.BLACK);
         int y = 20;
         
-        g2d.setFont(new Font("Arial", Font.BOLD, 18));
+        g2d.setFont(new Font("Arial", Font.BOLD, 24));
         drawCenteredString(g2d, "CrudPark", TICKET_WIDTH, y);
-        y += 20;
+        y += 30;
         
-        g2d.setFont(new Font("Arial", Font.PLAIN, 12));
+        g2d.setFont(new Font("Arial", Font.PLAIN, 16));
         drawCenteredString(g2d, "Parking Management System", TICKET_WIDTH, y);
-        y += 25;
+        y += 30;
         
         drawLine(g2d, y);
-        y += 20;
+        y += 25;
         
-        g2d.setFont(new Font("Monospaced", Font.BOLD, 14));
+        g2d.setFont(new Font("Monospaced", Font.BOLD, 18));
         g2d.drawString("Ticket #: " + String.format("%06d", ticket.getId()), 20, y);
-        y += 25;
+        y += 30;
         
-        g2d.setFont(new Font("Monospaced", Font.PLAIN, 12));
+        g2d.setFont(new Font("Monospaced", Font.BOLD, 16));
         g2d.drawString("Plate: " + ticket.getPlate(), 20, y);
-        y += 20;
-        g2d.drawString("Type: " + ticket.getTicketType(), 20, y);
-        y += 20;
-        g2d.drawString("Entry: ", 20, y);
-        y += 15;
-        g2d.setFont(new Font("Monospaced", Font.PLAIN, 10));
-        g2d.drawString("  " + ticket.getEntryTime().format(DATE_FORMAT), 20, y);
-        y += 20;
-        g2d.setFont(new Font("Monospaced", Font.PLAIN, 12));
-        g2d.drawString("Operator: " + ticket.getOperatorName(), 20, y);
         y += 25;
+        g2d.drawString("Type: " + ticket.getTicketType(), 20, y);
+        y += 25;
+        g2d.drawString("Entry: ", 20, y);
+        y += 20;
+        g2d.setFont(new Font("Monospaced", Font.PLAIN, 14));
+        g2d.drawString("  " + ticket.getEntryTime().format(DATE_FORMAT), 20, y);
+        y += 25;
+        g2d.setFont(new Font("Monospaced", Font.BOLD, 16));
+        g2d.drawString("Operator: " + ticket.getOperatorName(), 20, y);
+        y += 30;
         
         drawLine(g2d, y);
         y += 20;
@@ -193,9 +193,9 @@ public class TicketPrinter {
         drawLine(g2d, y);
         y += 20;
         
-        g2d.setFont(new Font("Arial", Font.ITALIC, 10));
+        g2d.setFont(new Font("Arial", Font.ITALIC, 14));
         drawCenteredString(g2d, "Thank you for your visit", TICKET_WIDTH, y);
-        y += 15;
+        y += 20;
         drawCenteredString(g2d, "Keep this ticket", TICKET_WIDTH, y);
         
         g2d.dispose();
