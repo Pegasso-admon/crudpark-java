@@ -1,9 +1,9 @@
-// ui/MainFrame.java
 package com.crudpark.ui;
 
 import com.crudpark.model.Operator;
 
 import javax.swing.*;
+import javax.swing.border.EmptyBorder;
 import java.awt.*;
 
 public class MainFrame extends JFrame {
@@ -21,23 +21,64 @@ public class MainFrame extends JFrame {
 
     private void initComponents() {
         tabbedPane = new JTabbedPane();
+        tabbedPane.setBackground(new Color(30, 30, 30));
+        tabbedPane.setForeground(Color.WHITE);
+        tabbedPane.setFont(new Font("Arial", Font.BOLD, 13));
+        
         entryPanel = new VehicleEntryPanel(currentOperator);
         exitPanel = new VehicleExitPanel(currentOperator);
+        
+        tabbedPane.addTab(" 🚗 Vehicle Entry ", entryPanel);
+        tabbedPane.addTab(" 🚪 Vehicle Exit ", exitPanel);
+        
+        tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     }
 
     private void setupLayout() {
-        tabbedPane.addTab("Vehicle Entry", entryPanel);
-        tabbedPane.addTab("Vehicle Exit", exitPanel);
+        getContentPane().setBackground(new Color(30, 30, 30));
         
         JPanel topPanel = new JPanel(new BorderLayout());
-        topPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        topPanel.setBackground(new Color(25, 25, 25));
+        topPanel.setBorder(BorderFactory.createCompoundBorder(
+            BorderFactory.createMatteBorder(0, 0, 2, 0, new Color(0, 150, 136)),
+            new EmptyBorder(15, 20, 15, 20)
+        ));
         
-        JLabel welcomeLabel = new JLabel("Operator: " + currentOperator.getName());
-        welcomeLabel.setFont(new Font("Arial", Font.BOLD, 14));
-        topPanel.add(welcomeLabel, BorderLayout.WEST);
+        JPanel leftInfo = new JPanel(new FlowLayout(FlowLayout.LEFT, 15, 0));
+        leftInfo.setBackground(new Color(25, 25, 25));
+        
+        JLabel titleLabel = new JLabel("CrudPark");
+        titleLabel.setFont(new Font("Arial", Font.BOLD, 20));
+        titleLabel.setForeground(new Color(0, 150, 136));
+        
+        JLabel operatorLabel = new JLabel("Operator: " + currentOperator.getName());
+        operatorLabel.setFont(new Font("Arial", Font.PLAIN, 14));
+        operatorLabel.setForeground(Color.WHITE);
+        
+        leftInfo.add(titleLabel);
+        leftInfo.add(Box.createHorizontalStrut(30));
+        leftInfo.add(operatorLabel);
         
         JButton logoutButton = new JButton("Logout");
+        logoutButton.setFont(new Font("Arial", Font.BOLD, 12));
+        logoutButton.setBackground(new Color(244, 67, 54));
+        logoutButton.setForeground(Color.WHITE);
+        logoutButton.setFocusPainted(false);
+        logoutButton.setBorderPainted(false);
+        logoutButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        logoutButton.setPreferredSize(new Dimension(100, 35));
         logoutButton.addActionListener(e -> logout());
+        
+        logoutButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                logoutButton.setBackground(new Color(255, 87, 74));
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                logoutButton.setBackground(new Color(244, 67, 54));
+            }
+        });
+        
+        topPanel.add(leftInfo, BorderLayout.WEST);
         topPanel.add(logoutButton, BorderLayout.EAST);
         
         add(topPanel, BorderLayout.NORTH);
@@ -46,9 +87,15 @@ public class MainFrame extends JFrame {
 
     private void setFrameProperties() {
         setTitle("CrudPark - Operations System");
-        setSize(800, 600);
+        setSize(1200, 700);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
+        try {
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
     private void logout() {
