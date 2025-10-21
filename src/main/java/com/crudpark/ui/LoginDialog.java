@@ -22,7 +22,7 @@ public class LoginDialog extends JDialog {
         authenticatedOperator = null;
 
         setTitle("CrudPark - Login");
-        setSize(450, 350);
+        setSize(450, 400);
         setLocationRelativeTo(parent);
         setResizable(false);
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
@@ -62,6 +62,8 @@ public class LoginDialog extends JDialog {
         loginButton.setBorderPainted(false);
         loginButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         loginButton.setPreferredSize(new Dimension(120, 40));
+        loginButton.setMinimumSize(new Dimension(120, 40));
+        loginButton.setMaximumSize(new Dimension(120, 40));
     }
 
     private void setupLayout() {
@@ -113,6 +115,13 @@ public class LoginDialog extends JDialog {
         
         loginButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         mainPanel.add(loginButton);
+        mainPanel.add(Box.createVerticalStrut(10));
+        
+        JLabel hintLabel = new JLabel("Default: admin / admin123");
+        hintLabel.setFont(new Font("Arial", Font.ITALIC, 10));
+        hintLabel.setForeground(Color.GRAY);
+        hintLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        mainPanel.add(hintLabel);
         
         add(mainPanel, BorderLayout.CENTER);
     }

@@ -3,6 +3,7 @@ package com.crudpark.ui;
 import com.crudpark.dao.TicketDAO;
 import com.crudpark.model.Operator;
 import com.crudpark.model.Ticket;
+import com.crudpark.util.TicketPrinter;
 
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
@@ -22,13 +23,16 @@ public class ActiveTicketsPanel extends JPanel {
     private JTable ticketsTable;
     private DefaultTableModel tableModel;
     private JButton refreshButton;
+    private JButton printButton;
     private JLabel totalTicketsLabel;
     private JLabel lastUpdateLabel;
     private Timer autoRefreshTimer;
+    private List<Ticket> currentTickets;
 
     public ActiveTicketsPanel(Operator operator) {
         this.currentOperator = operator;
         this.ticketDAO = new TicketDAO();
+        this.currentTickets = new ArrayList<>();
         
         setBackground(new Color(30, 30, 30));
         initComponents();
@@ -107,6 +111,16 @@ public class ActiveTicketsPanel extends JPanel {
         refreshButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
         refreshButton.setPreferredSize(new Dimension(100, 35));
         
+        printButton = new JButton("Print Selected");
+        printButton.setFont(new Font("Arial", Font.BOLD, 13));
+        printButton.setBackground(new Color(96, 125, 139));
+        printButton.setForeground(Color.WHITE);
+        printButton.setFocusPainted(false);
+        printButton.setBorderPainted(false);
+        printButton.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        printButton.setPreferredSize(new Dimension(130, 35));
+        printButton.setEnabled(false);
+        
         totalTicketsLabel = new JLabel("Total Active Tickets: 0");
         totalTicketsLabel.setFont(new Font("Arial", Font.BOLD, 14));
         totalTicketsLabel.setForeground(Color.WHITE);
@@ -134,8 +148,9 @@ public class ActiveTicketsPanel extends JPanel {
         infoPanel.add(Box.createVerticalStrut(5));
         infoPanel.add(lastUpdateLabel);
         
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT, 10, 0));
         buttonPanel.setBackground(new Color(30, 30, 30));
+        buttonPanel.add(printButton);
         buttonPanel.add(refreshButton);
         
         topPanel.add(infoPanel, BorderLayout.WEST);
@@ -151,6 +166,13 @@ public class ActiveTicketsPanel extends JPanel {
 
     private void addListeners() {
         refreshButton.addActionListener(e -> loadActiveTickets());
+        printButton.addActionListener(e -> printSelectedTicket());
+        
+        ticketsTable.getSelectionModel().addListSelectionListener(e -> {
+            if (!e.getValueIsAdjusting()) {
+                printButton.setEnabled(ticketsTable.getSelectedRow() != -1);
+            }
+        });
         
         refreshButton.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseEntered(java.awt.event.MouseEvent evt) {
@@ -158,6 +180,19 @@ public class ActiveTicketsPanel extends JPanel {
             }
             public void mouseExited(java.awt.event.MouseEvent evt) {
                 refreshButton.setBackground(new Color(0, 150, 136));
+            }
+        });
+        
+        printButton.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                if (printButton.isEnabled()) {
+                    printButton.setBackground(new Color(120, 144, 156));
+                }
+            }
+            public void mouseExited(java.awt.event.MouseEvent evt) {
+                if (printButton.isEnabled()) {
+                    printButton.setBackground(new Color(96, 125, 139));
+                }
             }
         });
     }
@@ -173,6 +208,7 @@ public class ActiveTicketsPanel extends JPanel {
             protected void done() {
                 try {
                     List<Ticket> tickets = get();
+                    currentTickets = tickets;
                     updateTable(tickets);
                     
                     totalTicketsLabel.setText("Total Active Tickets: " + tickets.size());
@@ -254,6 +290,25 @@ public class ActiveTicketsPanel extends JPanel {
             };
             
             tableModel.addRow(row);
+        }
+    }
+
+    private void printSelectedTicket() {
+        int selectedRow = ticketsTable.getSelectedRow();
+        if (selectedRow == -1) {
+            JOptionPane.showMessageDialog(
+                this,
+                "Please select a ticket to print",
+                "No Selection",
+                JOptionPane.WARNING_MESSAGE
+            );
+            return;
+        }
+        
+        if (selectedRow >= 0 && selectedRow < currentTickets.size()) {
+            Ticket selectedTicket = currentTickets.get(selectedRow);
+            Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+            TicketPrinter.printTicket(selectedTicket, parentFrame);
         }
     }
 
