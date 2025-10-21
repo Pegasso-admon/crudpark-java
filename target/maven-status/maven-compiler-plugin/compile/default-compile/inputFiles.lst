@@ -11,6 +11,7 @@
 /home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/dao/MembershipDAO.java
 /home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/ui/LoginDialog.java
 /home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/util/DbConnection.java
+/home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/ui/ActiveTicketsPanel.java
 /home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/model/Membership.java
 /home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/MainApp.java
 /home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/service/OperatorService.java
@@ -19,3 +20,4 @@
 /home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/dao/TicketDAO.java
 /home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/util/QRCodeGenerator.java
 /home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/service/ParkingService.java
+/home/javaspringboot/Documentos/crudpark-java/src/main/java/com/crudpark/ui/PrinterSelectionDialog.java

@@ -11,6 +11,7 @@ public class MainFrame extends JFrame {
     private JTabbedPane tabbedPane;
     private VehicleEntryPanel entryPanel;
     private VehicleExitPanel exitPanel;
+    private ActiveTicketsPanel activeTicketsPanel;
 
     public MainFrame(Operator operator) {
         this.currentOperator = operator;
@@ -27,9 +28,11 @@ public class MainFrame extends JFrame {
         
         entryPanel = new VehicleEntryPanel(currentOperator);
         exitPanel = new VehicleExitPanel(currentOperator);
+        activeTicketsPanel = new ActiveTicketsPanel(currentOperator);
         
         tabbedPane.addTab(" 🚗 Vehicle Entry ", entryPanel);
         tabbedPane.addTab(" 🚪 Vehicle Exit ", exitPanel);
+        tabbedPane.addTab(" 📋 Active Tickets ", activeTicketsPanel);
         
         tabbedPane.setTabLayoutPolicy(JTabbedPane.SCROLL_TAB_LAYOUT);
     }
@@ -96,6 +99,15 @@ public class MainFrame extends JFrame {
         } catch (Exception e) {
             e.printStackTrace();
         }
+        
+        addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (activeTicketsPanel != null) {
+                    activeTicketsPanel.stopAutoRefresh();
+                }
+            }
+        });
     }
 
     private void logout() {
@@ -107,6 +119,9 @@ public class MainFrame extends JFrame {
         );
         
         if (confirm == JOptionPane.YES_OPTION) {
+            if (activeTicketsPanel != null) {
+                activeTicketsPanel.stopAutoRefresh();
+            }
             dispose();
             System.exit(0);
         }

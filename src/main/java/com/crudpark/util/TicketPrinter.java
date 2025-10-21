@@ -1,14 +1,11 @@
 package com.crudpark.util;
 
 import com.crudpark.model.Ticket;
+import com.crudpark.ui.PrinterSelectionDialog;
 import com.google.zxing.WriterException;
 
 import javax.imageio.ImageIO;
 import javax.print.*;
-import javax.print.attribute.HashPrintRequestAttributeSet;
-import javax.print.attribute.PrintRequestAttributeSet;
-import javax.print.attribute.standard.Copies;
-import javax.print.attribute.standard.MediaSizeName;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
@@ -21,6 +18,10 @@ public class TicketPrinter {
     private static final int TICKET_WIDTH = 300;
 
     public static void printTicket(Ticket ticket) {
+        printTicket(ticket, null);
+    }
+
+    public static void printTicket(Ticket ticket, Frame parentFrame) {
         try {
             System.out.println("\nStarting print process...");
             
@@ -36,19 +37,13 @@ public class TicketPrinter {
                 return;
             }
 
-            System.out.println("\nAvailable printers:");
-            for (int i = 0; i < printServices.length; i++) {
-                System.out.println("  [" + i + "] " + printServices[i].getName());
-            }
-
-            PrintService selectedPrinter = findThermalPrinter(printServices);
+            PrintService selectedPrinter = PrinterSelectionDialog.showDialog(parentFrame);
             
             if (selectedPrinter != null) {
                 System.out.println("Using printer: " + selectedPrinter.getName());
                 printToService(ticket, qrImage, selectedPrinter);
             } else {
-                System.out.println("Showing printer selection dialog...");
-                printWithDialog(ticket, qrImage);
+                System.out.println("Print cancelled by user");
             }
             
         } catch (Exception e) {
@@ -102,32 +97,6 @@ public class TicketPrinter {
         
         job.print();
         System.out.println("Ticket sent to printer: " + printService.getName());
-    }
-
-    private static void printWithDialog(Ticket ticket, BufferedImage qrImage) throws PrinterException {
-        PrinterJob job = PrinterJob.getPrinterJob();
-        
-        PageFormat pageFormat = job.defaultPage();
-        Paper paper = new Paper();
-        
-        double width = 165;
-        double height = 842;
-        paper.setSize(width, height);
-        
-        double margin = 5;
-        paper.setImageableArea(margin, margin, width - (margin * 2), height - (margin * 2));
-        
-        pageFormat.setPaper(paper);
-
-        job.setPrintable(new TicketPrintable(ticket, qrImage), pageFormat);
-
-        if (job.printDialog()) {
-            job.print();
-            System.out.println("Ticket printed successfully");
-        } else {
-            System.out.println("Print cancelled by user");
-            savePrintPreview(ticket, qrImage);
-        }
     }
 
     private static void savePrintPreview(Ticket ticket, BufferedImage qrImage) {
@@ -190,7 +159,7 @@ public class TicketPrinter {
         y += 20;
         
         g2d.setFont(new Font("Arial", Font.PLAIN, 12));
-        drawCenteredString(g2d, "Parking System", TICKET_WIDTH, y);
+        drawCenteredString(g2d, "Parking Management System", TICKET_WIDTH, y);
         y += 25;
         
         drawLine(g2d, y);

@@ -243,7 +243,8 @@ public class VehicleEntryPanel extends JPanel {
     
     private void printLastTicket() {
         if (lastTicket != null) {
-            TicketPrinter.printTicket(lastTicket);
+            Frame parentFrame = (Frame) SwingUtilities.getWindowAncestor(this);
+            TicketPrinter.printTicket(lastTicket, parentFrame);
         }
     }
     
