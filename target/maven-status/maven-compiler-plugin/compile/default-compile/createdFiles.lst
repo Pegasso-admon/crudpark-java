@@ -1,4 +1,5 @@
 com/crudpark/ui/PrinterSelectionDialog$4.class
+com/crudpark/ui/ActiveTicketsPanel$5.class
 com/crudpark/ui/LoginDialog$1.class
 com/crudpark/service/ParkingService.class
 com/crudpark/model/Ticket.class
